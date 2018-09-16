@@ -3,8 +3,12 @@ from pydrive.drive import GoogleDrive
 import requests
 
 # Fetch weather forecast data
-weather_query = 'select * from weather.forecast where woeid in (select woeid from geo.places(1) where text="Seattle, WA")'
-data = requests.get('https://query.yahooapis.com/v1/public/yql?format=json&q=' + weather_query)
+weather_query = '''
+    select * from weather.forecast where woeid in 
+        (select woeid from geo.places(1) 
+            where text="Seattle, WA")'''
+data = requests.get('https://query.yahooapis.com/v1/public/yql?format=json&q=' \
+    + weather_query)
 data_json = data.json()
 
 # Open or create google drive file
@@ -24,4 +28,4 @@ for item in data_json['query']['results']['channel']['item']['forecast']:
     content += '{},{},{}\n'.format(item['date'],item['high'], item['low'])
 gd_file.SetContentString(content)
 gd_file.Upload()
-print('File uploaded, title: %s, id: %s' % (gd_file['title'], gd_file['id']))
+print('File uploaded, title: {}, id: {}'.format(gd_file['title'], gd_file['id']))
